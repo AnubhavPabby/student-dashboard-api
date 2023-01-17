@@ -68,11 +68,11 @@ public class StudentService {
             student.setName(name);
         }
 
-        if(email != null && email.length() > 0 && !Objects.equals(email, student.getEmail())) {
+        if(email != null && email.length() > 0 && !Objects.equals(name, student.getEmail())) {
             Optional<Student> studentByEmail = studentDao.findStudentByEmail(email);
 
             if(studentByEmail.isPresent()) {
-                throw new IllegalStateException("Student already exists with email " + student.getEmail() + ". Please provide any other email.");
+                throw new IllegalStateException("Student already exists with email " + email);
             } else {
                 student.setEmail(email);
             }
@@ -88,12 +88,12 @@ public class StudentService {
     }
 
     public void deleteStudentById(Long studentId) {
-        Optional<Student> studentById = studentDao.findById(studentId);
+        boolean doesStudentExists = studentDao.existsById(studentId);
 
-        if (studentById.isEmpty()) {
+        if (!doesStudentExists) {
             throw new IllegalStateException("Cannot find student with this studentId " + studentId);
         } else {
-            studentDao.delete(studentById.get());
+            studentDao.deleteById(studentId);
         }
     }
 }

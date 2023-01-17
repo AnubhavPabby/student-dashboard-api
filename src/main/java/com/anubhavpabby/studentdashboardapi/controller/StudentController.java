@@ -43,7 +43,7 @@ public class StudentController {
         studentService.addNewStudent(student);
     }
 
-    @PutMapping(path="update-student-by-ID/{studentId}")
+    @PutMapping(path="update-student-by-id/{studentId}")
     public void updateStudent(@PathVariable("studentId") Long studentId,
                               @RequestParam(value = "name", required = false) String name,
                               @RequestParam(value = "email", required = false) String email,
