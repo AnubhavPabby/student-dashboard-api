@@ -5,13 +5,20 @@ import java.time.LocalDate;
 import java.time.Period;
 
 @Entity
-@Table
+@Table(name="students")
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="student_id")
     private Long id;
+
+    @Column(name="student_name")
     private String name;
+
+    @Column(name="student_email")
     private String email;
+
+    @Column(name="student_dob")
     private LocalDate dob;
 
     // Transient informs that this property should be ignored while forming columns in tables
