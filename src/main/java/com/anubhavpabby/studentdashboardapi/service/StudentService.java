@@ -1,45 +1,46 @@
 package com.anubhavpabby.studentdashboardapi.service;
 
+import com.anubhavpabby.studentdashboardapi.dao.StudentDao;
 import com.anubhavpabby.studentdashboardapi.model.Student;
-import com.anubhavpabby.studentdashboardapi.repository.StudentRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class StudentService {
-    private final StudentRepository studentRepository;
+    private final StudentDao studentDao;
 
     @Autowired
-    public StudentService(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
+    public StudentService(StudentDao studentDao) {
+        this.studentDao = studentDao;
     }
 
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        return studentDao.findAll();
     }
 
-    public Student getStudentByEmail(String email) {
-        Optional<Student> studentByEmail = studentRepository.findStudentByEmail(email);
+    public Student getStudentById(Long studentId) {
+        Optional<Student> studentById = studentDao.findById(studentId);
 
-        if(studentByEmail.isEmpty()) {
-            throw new IllegalStateException("Student does not exist with email " + email);
+        if(studentById.isEmpty()) {
+            throw new IllegalStateException("Student does not exist with this studentId " + studentId);
         }
 
-        return studentByEmail.get();
+        return studentById.get();
     }
 
     public void addNewStudent(Student student) {
-        Optional<Student> studentByEmail = studentRepository.findStudentByEmail(student.getEmail());
+        Optional<Student> studentByEmail = studentDao.findStudentByEmail(student.getEmail());
 
         if(studentByEmail.isPresent()) {
             throw new IllegalStateException("Student already exists with email " + student.getEmail());
         } else {
-            studentRepository.save(student);
+            studentDao.save(student);
         }
     }
 
@@ -53,17 +54,46 @@ public class StudentService {
 //        }
 //    }
 
-    public void deleteAllStudents() {
-        studentRepository.deleteAll();
+    @Transactional
+    public void updateStudent(Long studentId, String name, String email, LocalDate dob) {
+        Optional<Student> studentById = studentDao.findById(studentId);
+
+        if(studentById.isEmpty()) {
+            throw new IllegalStateException("Student does not exist with this studentId " + studentId);
+        }
+
+        Student student = studentById.get();
+
+        if(name != null && name.length() > 0 && !Objects.equals(name, student.getName())) {
+            student.setName(name);
+        }
+
+        if(email != null && email.length() > 0 && !Objects.equals(email, student.getEmail())) {
+            Optional<Student> studentByEmail = studentDao.findStudentByEmail(email);
+
+            if(studentByEmail.isPresent()) {
+                throw new IllegalStateException("Student already exists with email " + student.getEmail() + ". Please provide any other email.");
+            } else {
+                student.setEmail(email);
+            }
+        }
+
+        if(dob != null && !Objects.equals(dob, student.getDob())) {
+            student.setDob(dob);
+        }
     }
 
-    public void deleteStudentByEmail(String email) {
-        Optional<Student> studentByEmail = studentRepository.findStudentByEmail(email);
+    public void deleteAllStudents() {
+        studentDao.deleteAll();
+    }
 
-        if(studentByEmail.isEmpty()) {
-            throw new IllegalStateException("Cannot find student with the email " + email);
+    public void deleteStudentById(Long studentId) {
+        Optional<Student> studentById = studentDao.findById(studentId);
+
+        if (studentById.isEmpty()) {
+            throw new IllegalStateException("Cannot find student with this studentId " + studentId);
         } else {
-            studentRepository.delete(studentByEmail.get());
+            studentDao.delete(studentById.get());
         }
     }
 }

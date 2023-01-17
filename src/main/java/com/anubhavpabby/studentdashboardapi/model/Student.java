@@ -13,6 +13,8 @@ public class Student {
     private String name;
     private String email;
     private LocalDate dob;
+
+    // Transient informs that this property should be ignored while forming columns in tables
     @Transient
     private Integer age;
 

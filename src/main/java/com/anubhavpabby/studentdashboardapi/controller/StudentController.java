@@ -5,10 +5,12 @@ import com.anubhavpabby.studentdashboardapi.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "api/v1/students")
+@RequestMapping(path="api/v1/students")
 public class StudentController {
     private final StudentService studentService;
 
@@ -22,28 +24,49 @@ public class StudentController {
         return studentService.getAllStudents();
     }
 
-    @GetMapping(path="/get-student-by-email")
-    public Student getStudentByEmail(@RequestParam("email") String email) {
-        return studentService.getStudentByEmail(email);
+    // Getting student by studentId
+    // studentId is passed here as request param variable
+    @GetMapping(path="/get-student-by-id")
+    public Student getStudentById(@RequestParam("studentId") Long studentId) {
+        return studentService.getStudentById(studentId);
     }
+
+//    Getting student by studentId
+//    studentId is passed here as path variable
+//    @GetMapping(path="/get-student-by-id/{studentId}")
+//    public Student getStudentById(@PathVariable("studentId") Long studentId) {
+//        return studentService.getStudentById(studentId);
+//    }
 
     @PostMapping(path="create-new-student")
     public void addNewStudent(@RequestBody Student student) {
         studentService.addNewStudent(student);
     }
 
-//    @PostMapping(path="create-new-student")
-//    public void addNewStudent(@RequestParam("email") String email, @RequestParam("name") String name, @RequestParam("date-of-birth") LocalDate dateOfBirth) {
-//        studentService.addNewStudent(email, name, dateOfBirth);
-//    }
+    @PutMapping(path="update-student-by-ID/{studentId}")
+    public void updateStudent(@PathVariable("studentId") Long studentId,
+                              @RequestParam(value = "name", required = false) String name,
+                              @RequestParam(value = "email", required = false) String email,
+                              @RequestParam(value = "dob", required = false) LocalDate dob) {
+        studentService.updateStudent(studentId, name, email, dob);
+    }
 
     @DeleteMapping("delete-all-students")
     public void deleteAllStudents() {
         studentService.deleteAllStudents();
     }
 
-    @DeleteMapping(path="/delete-student-by-email")
-    public void deleteStudentByEmail(@RequestParam("email") String email) {
-        studentService.deleteStudentByEmail(email);
+    // Deleting student by studentId
+    // studentId is passed here as request param variable
+    @DeleteMapping(path="/get-student-by-id")
+    public void deleteStudentById(@RequestParam("studentId") Long studentId) {
+        studentService.deleteStudentById(studentId);
     }
+
+//    Deleting student by studentId
+//    studentId is passed here as path variable
+//    @DeleteMapping(path="/get-student-by-id/{studentId}")
+//    public void deleteStudentById(@PathVariable("studentId") Long studentId) {
+//        studentService.deleteStudentById(studentId);
+//    }
 }
